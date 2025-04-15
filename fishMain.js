@@ -9,7 +9,7 @@ const getRandomFloat = (min, max) => {
 };
 
 exports.start = () => {
-    const guid = util.generateRandomString(8); // Generate a random string of length 16
+    const guid = util.generateRandomString(12); // Generate a random string of length 16
     const randomDuration = getRandomFloat(20, 76) * 1000;
     const timestamp = Number(new Date()) + randomDuration;
 
@@ -18,8 +18,6 @@ exports.start = () => {
     const fish = fishPool[Math.random() * fishPool.length | 0];
 
     const weight = getRandomFloat(fish.minWeightMultiplier, fish.maxWeightMultiplier);
-
-    console.log(fishData.traitTable);
 
     fishSignals[guid] = {
         data : {
@@ -30,6 +28,7 @@ exports.start = () => {
                 rarity: fish.rarity,
                 trait: Math.random() < 0.1 ? fishData.traitTable[Math.floor(Math.random() * fishData.traitTable.length)] : null,
                 visualAddress: fish.visualAddress,
+                spriteAddress: fish.imgPath,
                 id: fish.id,
                 description: fish.description,
                 weight: weight,
@@ -37,25 +36,46 @@ exports.start = () => {
                 dancingStep: getRandomFloat(fish.dancingStepMin, fish.dancingStepMax),
             },
         },
+        isValid : true,
         timestamp: timestamp,
         timeout: randomDuration,
         timeoutCon: setTimeout(() => {
             delete fishSignals[guid];
             console.log(`${guid} has been removed from fishSignals.`);
-        }, randomDuration),
+        }, randomDuration + 15000),
     };
 
-    return fishSignals[guid]["data"];
+    return {guid: guid, time: fishSignals[guid]['timeout']};
 };
 
 exports.end = (guid, suc) => {
     if (fishSignals[guid]) {
+        if (fishSignals[guid].isValid == false) return;
+
+        
+
+        fishSignals[guid].isValid = false;
         clearTimeout(fishSignals[guid].timeoutCon);
+        delete fishSignals[guid].timeoutCon;
+        fishSignals[guid].timeoutCon = undefined;
         let fishData = fishSignals[guid];
         delete fishSignals[guid];
-        return fishData;
+        fishData.data.suc = true;
+        return fishData.data;
     }
-    return false;
+    else
+    {
+        fishSignals[guid].data.suc = true;
+    }
+
+    if (!suc || fishSignals[guid] == null) 
+    {
+        return {
+            suc : false,
+        }
+    }
+
+    return null;
 }
 
 exports.getFish = fishSignals;
