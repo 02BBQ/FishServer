@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const fishMain = require('./fishMain');
 const { loadSheet } = require('./fishDataLoad');
+// const { getDatabase, ref, set } = require('firebase/database');
 const app = express();
 const PORT = 3000;
 

@@ -1,9 +1,17 @@
+const { db } = require('firebase/firebaseConfig');
+
 let fishTable = [];
 let rarityTable = {};
 let traitTable = [];
 
 let rarityData = [];
 
+
+// 데이터 읽기
+async function readUserData(userId) {
+    const snapshot = await db.ref('users/' + userId).once('value');
+    return snapshot.val();
+}
 
 const groupFishByRarity = (fishList) => {
     const grouped = {};

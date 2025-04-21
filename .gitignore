@@ -128,3 +128,9 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+
+# Firebase 구성 파일
+/serviceAccountKey.json
+/firebase-config.js
+/.firebaserc
