@@ -3,7 +3,8 @@ const express = require('express');
 const cors = require('cors');
 const fishMain = require('./fishMain');
 const { loadSheet } = require('./fishDataLoad');
-// const { getDatabase, ref, set } = require('firebase/database');
+const { admin, db } = require('./firebase/firebaseConfig');
+
 const app = express();
 const PORT = 3000;
 
@@ -22,6 +23,7 @@ app.post('/api/fish/start', (req, res) => {
 });
 
 app.post('/api/fish/end', (req, res) => {
+    console.log(req.body);
     const result = fishMain.end(req.body.guid, req.body.suc);
     res.send(result);
 });

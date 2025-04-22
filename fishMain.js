@@ -1,4 +1,5 @@
 const { rarityTable, getRandomRarity, traitTable, getRarityTable } = require('./fishDataLoad');
+const { admin, db } = require('./firebase/firebaseConfig');
 const fishData = require('./fishDataLoad');
 const util = require('./util');
 
@@ -67,22 +68,34 @@ exports.start = () => {
 };
 
 exports.end = (guid, suc) => {
+    if (fishSignals[guid] == null) 
+        return {suc : false, err: "Fish not found."};
+    if (fishSignals[guid].isValid)
+        return {suc : false, err: "Fish not found."};
+    
     fishSignals[guid].isValid = false;
+    console.log("Fish end: ", fishSignals[guid].data.fish);
     if (!suc || fishSignals[guid] == null) 
     {
         return {
             suc : false,
         }
     }    
-    if (fishSignals[guid]) {
-        if (fishSignals[guid].isValid == false) return;
+    if (fishSignals[guid] != null) {
         clearTimeout(fishSignals[guid].timeoutCon);
         delete fishSignals[guid].timeoutCon;
         fishSignals[guid].timeoutCon = undefined;
         let fishData = fishSignals[guid];
         delete fishSignals[guid];
         fishData.data.suc = true;
-        return fishData.data;
+        
+        console.log("Fish caught: ", fishData.data.fish);
+        // db.ref(`inventory/test/${fishData.data.guid}`).set(fishData.fish);
+
+        return {
+            suc : true,
+            fish: fishData.data.fish,
+        };
     }
 
     return null;
