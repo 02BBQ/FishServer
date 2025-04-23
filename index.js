@@ -2,6 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 const fishMain = require('./fishMain');
+const dataStore = require('./firebase/dataStore');
 const { loadSheet } = require('./fishDataLoad');
 const { admin, db } = require('./firebase/firebaseConfig');
 
@@ -22,9 +23,13 @@ app.post('/api/fish/start', (req, res) => {
     res.send(result);
 });
 
-app.post('/api/fish/end', (req, res) => {
-    console.log(req.body);
-    const result = fishMain.end(req.body.guid, req.body.suc);
+app.post('/api/fish/end', async (req, res) => {
+    const result = await fishMain.end(req.body.guid, req.body.suc); 
+    res.send(result);
+});
+
+app.post(`/api/datastore/fishtank`, async (req, res) => {
+    const result = await dataStore.getInventoryData(req.body.userId);
     res.send(result);
 });
 

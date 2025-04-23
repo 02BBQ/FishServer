@@ -1,4 +1,5 @@
 const { rarityTable, getRandomRarity, traitTable, getRarityTable } = require('./fishDataLoad');
+const { getDatabase, ref, set, get } = require("firebase/database");
 const { admin, db } = require('./firebase/firebaseConfig');
 const fishData = require('./fishDataLoad');
 const util = require('./util');
@@ -43,7 +44,8 @@ exports.start = () => {
                 id: fish.id,
                 description: fish.description,
                 weight: weight,
-                price: fish.basePrice * weight,
+                price: (fish.basePrice * weight).toFixed(3),
+                type: "Fish",
             },
         },
         dancingStep: getRandomFloat(fish.dancingStepMin, fish.dancingStepMax),
@@ -67,38 +69,36 @@ exports.start = () => {
     return {guid: guid, time: fishSignals[guid]['timeout'], dancingStep: fishSignals[guid]['dancingStep']};
 };
 
-exports.end = (guid, suc) => {
-    if (fishSignals[guid] == null) 
-        return {suc : false, err: "Fish not found."};
-    if (fishSignals[guid].isValid)
-        return {suc : false, err: "Fish not found."};
-    
-    fishSignals[guid].isValid = false;
-    console.log("Fish end: ", fishSignals[guid].data.fish);
-    if (!suc || fishSignals[guid] == null) 
-    {
-        return {
-            suc : false,
+exports.end = async (guid, suc) => {
+    try {
+        // 1. 초기 유효성 검사
+        if (!fishSignals[guid] || !fishSignals[guid].isValid) {
+            return { suc: false, err: "Fish not found." };
         }
-    }    
-    if (fishSignals[guid] != null) {
-        clearTimeout(fishSignals[guid].timeoutCon);
-        delete fishSignals[guid].timeoutCon;
-        fishSignals[guid].timeoutCon = undefined;
-        let fishData = fishSignals[guid];
-        delete fishSignals[guid];
-        fishData.data.suc = true;
+
+        // 2. 신호 무효화
+        fishSignals[guid].isValid = false;
         
-        console.log("Fish caught: ", fishData.data.fish);
-        // db.ref(`inventory/test/${fishData.data.guid}`).set(fishData.fish);
+        if (!suc) {
+            return { suc: false };
+        }
 
-        return {
-            suc : true,
-            fish: fishData.data.fish,
-        };
+        // 3. 데이터 추출 및 정리
+        const fishData = fishSignals[guid];
+        clearTimeout(fishData.timeoutCon);
+        delete fishSignals[guid];
+
+        // 4. Firebase 저장
+        const cleanData = JSON.parse(JSON.stringify(fishData.data.fish)); // undefined 제거
+        await set(ref(db, `inventory/test/${fishData.data.guid}`), cleanData, { merge: true });
+
+        console.log("Fish caught:", fishData.data.fish);
+        return { suc: true, fish: fishData.data.fish };
+
+    } catch (error) {
+        console.error("Error in end():", error);
+        return { suc: false, err: "Database error" };
     }
-
-    return null;
-}
+};
 
 exports.getFish = fishSignals;
