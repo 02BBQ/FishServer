@@ -7,12 +7,16 @@ const { admin, db } = require('../config/firebaseConfig');
 exports.initLoad = async (userId) => {
     try {
         let money = 100;
-        const snapshot = await get(ref(db, `inventory/${userId}/money`));
+        const snapshot = await get(ref(db, `users/${userId}/money`));
         {
-            if (snapshot.exists())
+            if (snapshot.exists() && snapshot.result)
+            {
                 money = snapshot.val();
+            }
             else
-                await set(ref(db, `inventory/${userId}/money`), money);
+            {
+                await set(ref(db, `users/${userId}/money`), money);
+            }
         }
         
         const userData = snapshot.val();
@@ -33,28 +37,24 @@ exports.initLoad = async (userId) => {
  */
 exports.getInventoryData = async (userId) => {
     try {
-        const snapshot = await get(ref(db, `inventory/${userId}`));
+        const snapshot = await get(ref(db, `users/${userId}`));
         if (!snapshot.exists()) return { items: {} };
         
-        const inventoryData = snapshot.val();
+        const userData = snapshot.val();
+        const inventoryData = userData.inventory || {};
         const result = {};
         
         // 각 아이템 타입별 처리
         for (const guid in inventoryData) {
             const item = inventoryData[guid];
-            const type = item.type || "none";
-            
-            // 해당 타입의 객체가 없으면 생성
-            if (!result[type]) {
-                result[type] = [];
-            }
-            
+            const type = item;
+
             // 아이템 데이터를 복사하고 guid 추가
             const itemWithGuid = { ...item, guid };
             
             // 아이템 데이터를 배열에 추가
-            result[type].push(itemWithGuid);
-        }
+            esult[type].push(itemWithGuid);
+        };
         
         return result;
     } catch (error) {

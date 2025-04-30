@@ -65,11 +65,14 @@ exports.start = () => {
         }, randomDuration + 15000),
     };
 
-    fishSignals[guid]['data']['fish']['weight'] = fishSignals[guid]['data']['fish']['weight'].toFixed(2);
-    if (fishSignals[guid]['data']['fish']['trait'] !== null && fishSignals[guid]['data']['fish']['trait'] !== undefined)
+    let tempFish = fishSignals[guid]['data']['fish'];
+
+    tempFish['weight'] = tempFish['weight'].toFixed(2);
+    if (tempFish['trait'] !== null && tempFish['trait'] !== undefined)
     {
-        fishSignals[guid]['data']['fish']['purity'] = quarticRandom();
+        tempFish['purity'] = quarticRandom();
     }
+
 
     return {
         guid: guid, 
@@ -102,7 +105,7 @@ exports.end = async (guid, suc) => {
 
         // 4. Firebase 저장
         const cleanData = JSON.parse(JSON.stringify(fishData.data.fish)); // undefined 제거
-        await set(ref(db, `inventory/test/fish/${fishData.data.guid}`), cleanData, { merge: true });
+        await set(ref(db, `users/test/inventory/${fishData.data.guid}`), cleanData, { merge: true });
 
         return { suc: true, fish: fishData.data.fish };
     } catch (error) {
