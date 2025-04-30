@@ -1,38 +1,28 @@
 // index.js
 const express = require('express');
 const cors = require('cors');
-const fishMain = require('./fishMain');
-const dataStore = require('./firebase/dataStore');
-const { loadSheet } = require('./fishDataLoad');
-const { admin, db } = require('./firebase/firebaseConfig');
+const fishDataService = require('./services/fishDataService');
+const routes = require('./routes');
 
 const app = express();
 const PORT = 3000;
 
-loadSheet();
+// 게임 데이터 초기 로드
+fishDataService.loadSheet();
 
+// 미들웨어 설정
 app.use(cors());
 app.use(express.json());
 
+// 라우트 설정
+app.use('/api', routes);
+
+// 기본 경로
 app.get('/', (req, res) => {
-    res.send('Hello World!');
+    res.send('Fish Server API');
 });
 
-app.post('/api/fish/start', (req, res) => {
-    const result = fishMain.start();
-    res.send(result);
-});
-
-app.post('/api/fish/end', async (req, res) => {
-    const result = await fishMain.end(req.body.guid, req.body.suc); 
-    res.send(result);
-});
-
-app.post(`/api/datastore/fishtank`, async (req, res) => {
-    const result = await dataStore.getInventoryData(req.body.userId);
-    res.send(result);
-});
-
+// 서버 시작
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });

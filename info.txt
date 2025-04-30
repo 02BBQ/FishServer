@@ -1,0 +1,21 @@
+FishServer/
+│
+├── config/                  # 설정 파일
+│   └── firebaseConfig.js    # Firebase 설정
+│
+├── controllers/             # 컨트롤러 계층 (요청/응답 처리)
+│   ├── fishController.js    # 물고기 컨트롤러
+│   └── datastoreController.js # 데이터스토어 컨트롤러
+│
+├── routes/                  # 라우팅 계층
+│   ├── index.js             # 메인 라우터
+│   ├── fishRoutes.js        # 물고기 관련 라우터
+│   └── datastoreRoutes.js   # 데이터스토어 관련 라우터
+│
+├── services/                # 서비스 계층 (비즈니스 로직)
+│   ├── fishService.js       # 물고기 서비스
+│   ├── fishDataService.js   # 물고기 데이터 서비스
+│   ├── datastoreService.js  # 데이터스토어 서비스
+│   └── utilService.js       # 유틸리티 서비스
+│
+└── index.js                 # 앱 엔트리 포인트
