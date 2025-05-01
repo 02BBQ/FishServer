@@ -24,7 +24,7 @@ exports.initLoad = async (userId) => {
             money : userData || 0,
             inventoryData : await this.getInventoryData(userId) || {},
         };
-        
+
         return result;
     } catch (error) {
         console.error('Error in initLoad:', error);
@@ -41,7 +41,12 @@ exports.getInventoryData = async (userId) => {
         if (!snapshot.exists()) return { items: {} };
         
         const userData = snapshot.val();
-        const inventoryData = userData.inventory || {};
+        let inventoryData;
+        if (userData.inventory) {
+            inventoryData = userData.items;
+        } else {
+            inventoryData = {};
+        }
         const result = {};
         
         // 각 아이템 타입별 처리

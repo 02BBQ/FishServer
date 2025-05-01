@@ -30,6 +30,7 @@ function quarticRandom() {
 /**
  * 낚시 시작
  */
+// TODO: userID를 받아야함?
 exports.start = () => {
     const guid = utilService.generateRandomString(12);
     const randomDuration = getRandomFloat(5, 20) * 1000;
@@ -84,6 +85,8 @@ exports.start = () => {
 /**
  * 낚시 종료
  */
+
+// TODO: userID를 받아야함.
 exports.end = async (guid, suc) => {
     try {
         // 1. 초기 유효성 검사
@@ -103,9 +106,11 @@ exports.end = async (guid, suc) => {
         clearTimeout(fishData.timeoutCon);
         delete fishSignals[guid];
 
+        const userId = "test";
+
         // 4. Firebase 저장
         const cleanData = JSON.parse(JSON.stringify(fishData.data.fish)); // undefined 제거
-        await set(ref(db, `users/test/inventory/${fishData.data.guid}`), cleanData, { merge: true });
+        await set(ref(db, `users/${userId}/inventory/fishes/${fishData.data.guid}`), cleanData, { merge: true });
 
         return { suc: true, fish: fishData.data.fish };
     } catch (error) {
