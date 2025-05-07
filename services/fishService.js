@@ -31,7 +31,7 @@ function quarticRandom() {
  * 낚시 시작
  */
 // TODO: userID를 받아야함?
-exports.start = () => {
+exports.startFishing = () => {
     const guid = utilService.generateRandomString(12);
     const randomDuration = getRandomFloat(5, 20) * 1000;
     const timestamp = Number(new Date()) + randomDuration;
@@ -87,9 +87,11 @@ exports.start = () => {
  */
 
 // TODO: userID를 받아야함.
-exports.end = async (guid, suc) => {
+exports.endFishing = async (guid, suc) => {
     try {
         // 1. 초기 유효성 검사
+        console.log(fishSignals, guid);
+        console.log(fishSignals[guid]);
         if (!fishSignals[guid] || !fishSignals[guid].isValid) {
             return { suc: false, err: "Fish not found." };
         }
@@ -114,7 +116,7 @@ exports.end = async (guid, suc) => {
 
         return { suc: true, fish: fishData.data.fish };
     } catch (error) {
-        console.error("Error in end():", error);
+        console.error("Error in endFishing():", error);
         return { suc: false, err: "Database error" };
     }
 };

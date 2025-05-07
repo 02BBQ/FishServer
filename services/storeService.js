@@ -30,10 +30,11 @@ exports.unityToDbType = (unityType) => {
 exports.loadStoreItems = async() => {
     console.log('상점 데이터 로드 중...');
     try {
-        const result = await fetch('https://script.googleusercontent.com/macros/echo?user_content_key=YOUR_SHEET_KEY');
-        const data = await result.json();
-        
+        const response = await fetch('https://script.google.com/macros/s/AKfycbz5u3jxyerqkbUFPqY8F7SMa9TR25Huay1iHBf_tcURUKsFcXAr6YnO0gq_OeOF-txI/exec?api=store');
+        const data = await response.json();
+
         storeItemTable = data;
+        
         console.log('상점 데이터 로드 완료:', Object.keys(storeItemTable).length, '개 아이템');
         return storeItemTable;
     } catch (error) {

@@ -2,6 +2,35 @@ syntax = "proto3";
 
 package fish;
 
+// 물고기 서비스 정의
+service FishService {
+  // 낚시 시작
+  rpc StartFishing (StartFishingRequest) returns (FishingStartResponse) {}
+  
+  // 낚시 종료
+  rpc EndFishing (EndFishingRequest) returns (FishingEndResponse) {}
+  
+  // 활성화된 물고기 신호 조회
+  rpc GetActiveFishSignals (GetActiveFishSignalsRequest) returns (ActiveFishSignals) {}
+}
+
+// 낚시 시작 요청
+message StartFishingRequest {
+  string user_id = 1;
+}
+
+// 낚시 종료 요청
+message EndFishingRequest {
+  string user_id = 1;
+  string guid = 2;
+  bool success = 3;
+}
+
+// 활성화된 물고기 신호 조회 요청
+message GetActiveFishSignalsRequest {
+  string user_id = 1;
+}
+
 // 낚시 시작 응답
 message FishingStartResponse {
   string guid = 1;

@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package datastore;
+
+// 데이터스토어 서비스 정의
+service DatastoreService {
+  // 초기 데이터 로드
+  rpc InitLoad (InitLoadRequest) returns (InitLoadResponse) {}
+  
+  // 인벤토리 데이터 조회
+  rpc GetInventoryData (GetInventoryRequest) returns (InventoryResponse) {}
+}
+
+// 초기 데이터 로드 요청
+message InitLoadRequest {
+  string user_id = 1;
+}
+
+// 초기 데이터 로드 응답
+message InitLoadResponse {
+  float money = 1;
+  InventoryData inventory_data = 2;
+}
+
+// 인벤토리 데이터 조회 요청
+message GetInventoryRequest {
+  string user_id = 1;
+}
+
+// 인벤토리 데이터 응답
+message InventoryResponse {
+  map<string, ItemList> items = 1;
+}
+
+// 아이템 리스트
+message ItemList {
+  repeated Item items = 1;
+}
+
+// 아이템 데이터
+message Item {
+  string guid = 1;
+  string id = 2;
+  int64 purchase_date = 3;
+  map<string, string> properties = 4;  // 추가 속성들을 저장
+}
+
+// 인벤토리 데이터
+message InventoryData {
+  map<string, ItemList> items = 1;
+} 
