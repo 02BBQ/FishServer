@@ -2,13 +2,25 @@
 const express = require('express');
 const cors = require('cors');
 const fishDataService = require('./services/fishDataService');
+const storeService = require('./services/storeService');
 const routes = require('./routes');
 
 const app = express();
 const PORT = 3000;
 
 // 게임 데이터 초기 로드
-fishDataService.loadSheet();
+async function loadGameData() {
+    try {
+        await fishDataService.loadSheet();
+        await storeService.loadStoreItems();
+        console.log('모든 게임 데이터 로드 완료');
+    } catch (error) {
+        console.error('게임 데이터 로드 중 오류 발생:', error);
+    }
+}
+
+// 데이터 로드 실행
+loadGameData();
 
 // 미들웨어 설정
 app.use(cors());
@@ -24,5 +36,5 @@ app.get('/', (req, res) => {
 
 // 서버 시작
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`서버 실행 중: http://localhost:${PORT}`);
 });
