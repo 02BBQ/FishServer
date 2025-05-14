@@ -10,8 +10,12 @@ const fishService = require('./services/fishService');
 const datastoreService = require('./services/datastoreService');
 
 const app = express();
-const PORT = 3000;
+const PORT = 5926;
 const GRPC_PORT = 50051;
+
+//New-NetFirewallRule -DisplayName "Node.js 5926" -Direction Inbound -LocalPort 5926 -Protocol TCP -Action Allow
+//Remove-NetFirewallRule -DisplayName "Node.js 5926"
+
 
 // 게임 데이터 초기 로드
 async function loadGameData() {
@@ -133,7 +137,7 @@ app.use(express.json());
 app.use('/api', routes);
 
 // Express 서버 시작
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`Express 서버 실행 중: http://localhost:${PORT}`);
 });
 

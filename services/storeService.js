@@ -34,7 +34,7 @@ exports.loadStoreItems = async() => {
         const data = await response.json();
 
         storeItemTable = data;
-        
+
         console.log('상점 데이터 로드 완료:', Object.keys(storeItemTable).length, '개 아이템');
         return storeItemTable;
     } catch (error) {
@@ -59,8 +59,19 @@ exports.getStoreItems = async () => {
 };
 
 // 아이템 구매
-exports.buy = async (userId, itemId) => {
+exports.buy = async (userId, itemName) => {
     try {
+        let item = Object.values(storeItemTable).find(t => t.Name === itemName);
+        // console.log(storeItemTable);
+        // console.log(itemName);
+        if (!item) {
+            console.error("Item not found");
+            return { success: false, message: "Item not found" };
+        }
+        let itemId = item.Id; // 아이템 ID를 설정
+        // item = storeItemTable[itemId];
+        // console.log(itemId);
+
         const userRef = ref(db, `users/${userId}`);
         const userSnapshot = await get(userRef);
 
@@ -72,22 +83,21 @@ exports.buy = async (userId, itemId) => {
         const userData = userSnapshot.val();
         const money = userData.money || 0;
 
-        const item = storeItemTable[itemId];
 
         if (!item) {
             console.error("Invalid item ID");
             return { success: false, message: "Invalid item ID" };
         }
         
-        if (money < item.price) {
+        if (money < item.CurrencyCount) {
             console.error("Not enough money");
             return { success: false, message: "Not enough money" };
         }
 
-        const newMoney = money - item.price;
+        const newMoney = money - item.CurrencyCount;
 
         // 유니티 아이템 타입을 DB 타입으로 변환
-        const dbItemType = this.unityToDbType(item.type);
+        const dbItemType = this.unityToDbType(item.Category);
         
         // 고유 ID 생성 (타임스탬프 + 랜덤 문자열)
         const itemGuid = Date.now() + '_' + utilService.generateRandomString(8);
@@ -112,13 +122,7 @@ exports.buy = async (userId, itemId) => {
         return { 
             success: true, 
             message: "Item purchased successfully",
-            item: { 
-                id: itemId, 
-                guid: itemGuid,
-                type: item.type,
-                name: item.name,
-                // 필요한 추가 정보
-            }
+            item: item,
         };
     } catch (error) {
         console.error("구매 처리 오류:", error);
