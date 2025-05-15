@@ -9,7 +9,7 @@ exports.initLoad = async (userId) => {
         let money = 100;
         const snapshot = await get(ref(db, `users/${userId}/money`));
         {
-            if (snapshot.exists() && snapshot.result)
+            if (snapshot.exists())
             {
                 money = snapshot.val();
             }
@@ -19,9 +19,8 @@ exports.initLoad = async (userId) => {
             }
         }
         
-        const userData = snapshot.val();
         const result = {
-            money : userData || 0,
+            money : money || 0,
             inventoryData : await this.getInventoryData(userId) || {},
         };
 

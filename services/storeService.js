@@ -101,6 +101,7 @@ exports.buy = async (userId, itemName) => {
         
         // 고유 ID 생성 (타임스탬프 + 랜덤 문자열)
         const itemGuid = Date.now() + '_' + utilService.generateRandomString(8);
+        item.Guid = itemGuid; // 아이템에 GUID 추가
         
         // 트랜잭션 시작 (여러 업데이트를 한번에 처리)
         const updates = {};
@@ -110,8 +111,9 @@ exports.buy = async (userId, itemName) => {
         
         // 인벤토리에 아이템 추가
         updates[`users/${userId}/inventory/${dbItemType}/${itemGuid}`] = {
-            id: itemId,
+            item: item,
             purchaseDate: Date.now(),
+
             // 추가 속성이 필요하면 여기에 추가
         };
         
