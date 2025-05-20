@@ -90,8 +90,6 @@ exports.startFishing = () => {
 exports.endFishing = async (guid, suc) => {
     try {
         // 1. 초기 유효성 검사
-        console.log(fishSignals, guid);
-        console.log(fishSignals[guid]);
         if (!fishSignals[guid] || !fishSignals[guid].isValid) {
             return { suc: false, err: "Fish not found." };
         }
@@ -112,7 +110,10 @@ exports.endFishing = async (guid, suc) => {
 
         // 4. Firebase 저장
         const cleanData = JSON.parse(JSON.stringify(fishData.data.fish)); // undefined 제거
-        await set(ref(db, `users/${userId}/inventory/fishes/${fishData.data.guid}`), cleanData, { merge: true });
+
+        console.log(cleanData);
+
+        await set(ref(db, `users/${userId}/inventory/Fish/${fishData.data.guid}`), cleanData, { merge: true });
 
         return { suc: true, fish: fishData.data.fish };
     } catch (error) {

@@ -62,15 +62,12 @@ exports.getStoreItems = async () => {
 exports.buy = async (userId, itemName) => {
     try {
         let item = Object.values(storeItemTable).find(t => t.Name === itemName);
-        // console.log(storeItemTable);
-        // console.log(itemName);
+        
         if (!item) {
             console.error("Item not found");
             return { success: false, message: "Item not found" };
         }
-        let itemId = item.Id; // 아이템 ID를 설정
-        // item = storeItemTable[itemId];
-        // console.log(itemId);
+        let itemId = item.Id; 
 
         const userRef = ref(db, `users/${userId}`);
         const userSnapshot = await get(userRef);

@@ -36,30 +36,25 @@ exports.initLoad = async (userId) => {
  */
 exports.getInventoryData = async (userId) => {
     try {
-        const snapshot = await get(ref(db, `users/${userId}`));
+        const snapshot = await get(ref(db, `users/${userId}/inventory`));
         if (!snapshot.exists()) return { items: {} };
-        
-        const userData = snapshot.val();
-        let inventoryData;
-        if (userData.inventory) {
-            inventoryData = userData.items;
-        } else {
-            inventoryData = {};
-        }
-        const result = {};
-        
-        // 각 아이템 타입별 처리
-        for (const guid in inventoryData) {
-            const item = inventoryData[guid];
-            const type = item;
 
-            // 아이템 데이터를 복사하고 guid 추가
-            const itemWithGuid = { ...item, guid };
-            
-            // 아이템 데이터를 배열에 추가
-            esult[type].push(itemWithGuid);
-        };
-        
+        const inventoryData = snapshot.val();
+        const result = {};
+
+        // 타입별로 반복 (예: FishingRod, ...)
+        for (const type in inventoryData) {
+            result[type] = [];
+            for (const guid in inventoryData[type]) {
+                const itemObj = inventoryData[type][guid];
+                // itemObj가 { item, purchaseDate } 구조임
+                result[type].push({
+                    guid: guid,
+                    item: itemObj.item,
+                });
+            }
+        }
+
         return result;
     } catch (error) {
         console.error("Error getting inventory:", error);
