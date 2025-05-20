@@ -111,8 +111,6 @@ exports.endFishing = async (guid, suc) => {
         // 4. Firebase 저장
         const cleanData = JSON.parse(JSON.stringify(fishData.data.fish)); // undefined 제거
 
-        console.log(cleanData);
-
         await set(ref(db, `users/${userId}/inventory/Fish/${fishData.data.guid}`), cleanData, { merge: true });
 
         return { suc: true, fish: fishData.data.fish };

@@ -50,7 +50,7 @@ exports.getInventoryData = async (userId) => {
                 // itemObj가 { item, purchaseDate } 구조임
                 result[type].push({
                     guid: guid,
-                    item: itemObj.item,
+                    ...itemObj,
                 });
             }
         }

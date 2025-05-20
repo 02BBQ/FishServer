@@ -108,8 +108,8 @@ exports.buy = async (userId, itemName) => {
         
         // 인벤토리에 아이템 추가
         updates[`users/${userId}/inventory/${dbItemType}/${itemGuid}`] = {
-            item: item,
             purchaseDate: Date.now(),
+            ...item,
 
             // 추가 속성이 필요하면 여기에 추가
         };
