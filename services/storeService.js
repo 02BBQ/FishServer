@@ -122,6 +122,7 @@ exports.buy = async (userId, itemName) => {
             success: true, 
             message: "Item purchased successfully",
             item: item,
+            money: newMoney,
         };
     } catch (error) {
         console.error("구매 처리 오류:", error);
