@@ -36,3 +36,23 @@ exports.buy = async (req, res) => {
 };
 
 
+exports.sell = async (req, res) => {
+    try {
+        const { userId, guid } = req.body;
+        
+        if (!userId || !guid) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "사용자 ID와 아이템 ID가 필요합니다" 
+            });
+        }
+        
+        const result = await storeService.sell(userId, guid);
+        res.json(result);
+    } catch (error) {
+        console.error('구매 처리 실패:', error);
+        res.status(500).json({ success: false, message: '서버 오류' });
+    }
+};
+
+

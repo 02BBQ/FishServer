@@ -129,3 +129,62 @@ exports.buy = async (userId, itemName) => {
         return { success: false, message: "Internal server error" };
     }
 };
+
+// 아이템 구매
+exports.sell = async (userId, guid) => {
+    try {
+        const userRef = ref(db, `users/${userId}`);
+        const userSnapshot = await get(userRef);
+
+        if (!userSnapshot.exists()) {
+            console.error("User not found");
+            return { success: false, message: "User not found" };
+        }
+
+        const userData = userSnapshot.val();
+        const money = userData.money || 0;
+
+        let item;
+
+        for (const dbType in userData.inventory) {
+            if (userData.inventory[dbType][guid]) {
+                item = userData.inventory[dbType][guid];
+                item.Category = this.dbToUnityType(dbType); // 유니티 타입으로 변환
+                break;
+            }
+        }
+
+        if (!item) {
+            console.error("Invalid item ID");
+            return { success: false, message: "Invalid item ID" };
+        }
+
+        const price = parseInt(item.CurrencyCount) || parseInt(item.price) || 0;
+
+        const newMoney = parseInt(money) + price;
+
+        console.log(price, newMoney);
+        
+        // 트랜잭션 시작 (여러 업데이트를 한번에 처리)
+        const updates = {};
+        
+        // 돈 업데이트
+        updates[`users/${userId}/money`] = newMoney;
+
+        updates[`users/${userId}/inventory/${this.unityToDbType(item.Category)}/${guid}`] = null; // 아이템 제거
+        
+        // 트랜잭션 실행 (한번에 여러 업데이트)
+        await update(ref(db), updates);
+
+        console.log(`아이템 ${item.Name} 판매 성공!`);
+        return { 
+            success: true, 
+            message: "Item purchased successfully",
+            item: item,
+            money: newMoney,
+        };
+    } catch (error) {
+        console.error("구매 처리 오류:", error);
+        return { success: false, message: "Internal server error" };
+    }
+};
