@@ -16,7 +16,8 @@
     "express": "^5.1.0",
     "firebase": "^10.8.0",
     "firebase-admin": "^12.0.0",
-    "google-protobuf": "^3.21.4"
+    "google-protobuf": "^3.21.4",
+    "steam-web": "^0.7.0"
   },
   "devDependencies": {
     "grpc-tools": "^1.12.4"

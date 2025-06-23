@@ -80,21 +80,35 @@ exports.buy = async (userId, itemName) => {
         const userData = userSnapshot.val();
         const money = userData.money || 0;
 
-
         if (!item) {
             console.error("Invalid item ID");
             return { success: false, message: "Invalid item ID" };
         }
         
-        if (money < item.CurrencyCount) {
+        // 이미 아이템을 가지고 있는지 체크
+        const dbItemType = this.unityToDbType(item.Category);
+        const inventoryRef = ref(db, `users/${userId}/inventory/${dbItemType}`);
+        const inventorySnapshot = await get(inventoryRef);
+        
+        if (inventorySnapshot.exists()) {
+            const inventory = inventorySnapshot.val();
+            // 같은 종류의 아이템이 이미 있는지 확인
+            const hasItem = Object.values(inventory).some(existingItem => 
+                existingItem.Id === item.Id
+            );
+            
+            if (hasItem) {
+                console.error("Already owns this item");
+                return { success: false, message: "이미 소지하고 있는 아이템입니다." };
+            }
+        }
+
+        if (money < item.Price) {
             console.error("Not enough money");
             return { success: false, message: "Not enough money" };
         }
 
-        const newMoney = money - item.CurrencyCount;
-
-        // 유니티 아이템 타입을 DB 타입으로 변환
-        const dbItemType = this.unityToDbType(item.Category);
+        const newMoney = money - item.Price;
         
         // 고유 ID 생성 (타임스탬프 + 랜덤 문자열)
         const itemGuid = Date.now() + '_' + utilService.generateRandomString(8);
@@ -110,8 +124,6 @@ exports.buy = async (userId, itemName) => {
         updates[`users/${userId}/inventory/${dbItemType}/${itemGuid}`] = {
             purchaseDate: Date.now(),
             ...item,
-
-            // 추가 속성이 필요하면 여기에 추가
         };
         
         // 트랜잭션 실행 (한번에 여러 업데이트)
@@ -136,6 +148,7 @@ exports.sell = async (userId, guid) => {
         const userRef = ref(db, `users/${userId}`);
         const userSnapshot = await get(userRef);
 
+        console.log(userId, guid);
         if (!userSnapshot.exists()) {
             console.error("User not found");
             return { success: false, message: "User not found" };
@@ -154,12 +167,13 @@ exports.sell = async (userId, guid) => {
             }
         }
 
+
         if (!item) {
             console.error("Invalid item ID");
             return { success: false, message: "Invalid item ID" };
         }
 
-        const price = parseInt(item.CurrencyCount) || parseInt(item.price) || 0;
+        const price = parseInt(item.Price) || parseInt(item.price) || 0;
 
         const newMoney = parseInt(money) + price;
 
@@ -179,7 +193,7 @@ exports.sell = async (userId, guid) => {
         console.log(`아이템 ${item.Name} 판매 성공!`);
         return { 
             success: true, 
-            message: "Item purchased successfully",
+            message: `${item.Name} sold successfully`,
             item: item,
             money: newMoney,
         };
