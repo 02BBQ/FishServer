@@ -11,7 +11,7 @@ const itemTypeMapping = {
     'fish': 'fishes',
     'fishingRod': 'rods',
     'boat': 'boats',
-    'bait': 'baits',
+    'bait': 'bait',
     // 필요한 매핑을 추가
 };
 
@@ -67,7 +67,7 @@ exports.buy = async (userId, itemName) => {
             console.error("Item not found");
             return { success: false, message: "Item not found" };
         }
-        let itemId = item.Id; 
+        let itemId = item.Id;
 
         const userRef = ref(db, `users/${userId}`);
         const userSnapshot = await get(userRef);
@@ -80,11 +80,6 @@ exports.buy = async (userId, itemName) => {
         const userData = userSnapshot.val();
         const money = userData.money || 0;
 
-        if (!item) {
-            console.error("Invalid item ID");
-            return { success: false, message: "Invalid item ID" };
-        }
-        
         // 이미 아이템을 가지고 있는지 체크
         const dbItemType = this.unityToDbType(item.Category);
         const inventoryRef = ref(db, `users/${userId}/inventory/${dbItemType}`);
@@ -121,15 +116,21 @@ exports.buy = async (userId, itemName) => {
         updates[`users/${userId}/money`] = newMoney;
         
         // 인벤토리에 아이템 추가
-        updates[`users/${userId}/inventory/${dbItemType}/${itemGuid}`] = {
+        let inventoryItem = {
             purchaseDate: Date.now(),
             ...item,
         };
+        // Bait면 address, baitMultiplier도 저장
+        if (dbItemType.toLowerCase() === 'bait' || item.Category.toLowerCase() === 'bait') {
+            inventoryItem.address = item.address;
+            inventoryItem.baitMultiplier = item.baitMultiplier;
+        }
+        updates[`users/${userId}/inventory/${dbItemType}/${itemGuid}`] = inventoryItem;
         
         // 트랜잭션 실행 (한번에 여러 업데이트)
         await update(ref(db), updates);
 
-        console.log(`아이템 ${itemId} 구매 성공!`);
+        console.log(`아이템 ${itemName} 구매 성공!`);
         return { 
             success: true, 
             message: "Item purchased successfully",

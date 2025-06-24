@@ -22,6 +22,7 @@ async function loadGameData() {
     try {
         await fishDataService.loadSheet();
         await storeService.loadStoreItems();
+        await fishService.loadBaitMap();
         console.log('모든 게임 데이터 로드 완료');
     } catch (error) {
         console.error('게임 데이터 로드 중 오류 발생:', error);

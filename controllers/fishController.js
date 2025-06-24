@@ -5,7 +5,8 @@ const fishService = require('../services/fishService');
  */
 exports.startFishing = async (req, res) => {
     try {
-        const result = await fishService.startFishing();
+        const { userId, baitGuid } = req.body;
+        const result = await fishService.startFishing(userId, baitGuid);
         res.json(result);
     } catch (error) {
         console.error('낚시 시작 에러:', error);
@@ -18,8 +19,8 @@ exports.startFishing = async (req, res) => {
  */
 exports.endFishing = async (req, res) => {
     try {
-        const { guid, suc } = req.body;
-        const result = await fishService.endFishing(guid, suc);
+        const { userId, guid, baitGuid, suc } = req.body;
+        const result = await fishService.endFishing(userId, guid, baitGuid, suc);
         res.json(result);
     } catch (error) {
         console.error('낚시 종료 에러:', error);

@@ -35,12 +35,23 @@ exports.loadSheet = async () => {
         const result = await fetch('https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLivTF4Pk_gqpFP31mrQ0wwsRgy2hmHG2SbFedQ3wLvOXivoCk1XMs7SxXrjBMe60-MwgSdjWCxleeTxjweLglQn1Ds5IatvMuWFN233jh0wEcCRS_tGb4W1rcAol2t4huNeGcvaq_3GEW0oDMWNPUlQ6ifWzFlFI6CE-l9_FB2TCHcFnQ85Icgdts_HKTe7fFGZUSnjQibIQBaSiJvhSmMt16nFkhIw3PmL0OlrXQJ2gWtXUKyTqjaqMQk5-pZDcIrxX4X-vqQl_PhLV1Xrjb5Noexrxw&lib=MwCv8SFRzZRP1P71XYDnI8A_aaQm-UuqJ');
         const data = await result.json();
 
+        // fishTable, baitTable 분리해서 관리
         fishTable = data[0];
         rarityData = data[1];
         traitTable = data[2];
 
+        // // baitTable도 fishTable에 합치기 (address, baitMultiplier 등 포함)
+        // for (const bait of baitTable) {
+        //     fishTable.push({
+        //         ...bait,
+        //         type: 'Bait',
+        //         address: bait.address,
+        //         baitMultiplier: bait.baitMultiplier
+        //     });
+        // }
+
         rarityTable = groupFishByRarity(fishTable);
-        console.log('Fish data loaded successfully');
+        console.log('Fish & Bait data loaded successfully');
     } catch (error) {
         console.error('Error loading fish data:', error);
         throw error;
@@ -52,6 +63,10 @@ exports.loadSheet = async () => {
  */
 exports.getRarityTable = () => {
     return rarityTable;
+};
+
+exports.getRarityData = () => {
+    return rarityData;
 };
 
 /**
@@ -93,4 +108,5 @@ exports.isTableValid = (table) => {
 // 외부 접근용 속성
 exports.fishTable = fishTable;
 exports.traitTable = traitTable;
-exports.rarityTable = rarityTable; 
+exports.rarityTable = rarityTable;
+exports.rarityData = rarityData; 

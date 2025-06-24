@@ -100,7 +100,7 @@ class SteamAuthService {
 
         } catch (error) {
             console.error('Steam authentication error:', error);
-            throw error;
+            // throw error;
         }
     }
 

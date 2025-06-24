@@ -18,16 +18,16 @@ exports.getStoreItems = async (req, res) => {
  */
 exports.buy = async (req, res) => {
     try {
-        const { userId, itemId } = req.body;
+        const { userId, itemName } = req.body;
         
-        if (!userId || !itemId) {
+        if (!userId || !itemName) {
             return res.status(400).json({ 
                 success: false, 
-                message: "사용자 ID와 아이템 ID가 필요합니다" 
+                message: "사용자 ID와 아이템 이름이 필요합니다" 
             });
         }
         
-        const result = await storeService.buy(userId, itemId);
+        const result = await storeService.buy(userId, itemName);
         res.json(result);
     } catch (error) {
         console.error('구매 처리 실패:', error);
